@@ -8,12 +8,14 @@ hold on;
 xlabel('Time, s');
 ylabel('Angle, rad');
 title('Angle vs Time');
+grid on;
 
 figure(2);
 hold on;
 xlabel('Time, s');
 ylabel('Angular Speed, rad/s');
 title('Angular Speed vs Time');
+grid on;
 
 for i = 1:length(files)
     data = readmatrix(files(i));
@@ -32,16 +34,17 @@ for i = 1:length(files)
 end
 
 figure(1);
-legend('show');
+legend('show', 'Location', 'eastoutside');
+grid on;
 hold off;
 
 figure(2);
-legend('show');
+legend('show', 'Location', 'eastoutside');
+grid on;
 hold off;
 
 w_nls = [];
 Tms = [];
-
 
 for i = 1:length(files)
     data = readmatrix(files(i));
@@ -53,7 +56,7 @@ for i = 1:length(files)
     angle = data(:, 2) * pi / 180; % Второй столбец - угол, переводим в радианы
     omega = data(:, 3) * pi / 180; % Третий столбец - угловая скорость, переводим в рад/с
 
-    time_apr = 0:0.01:1
+    time_apr = 0:0.01:1;
     par0 = [0.1; 0.06]; % Начальные значения
 
     fun = @(par, time) U_pr * par(1) * (time - par(2) * (1 - exp(-time / par(2))));
@@ -72,17 +75,16 @@ for i = 1:length(files)
     % График угла
     figure;
     hold on;
-    plot(time, angle, 'b', 'DisplayName', 'Experimental Data');
+    plot(time, angle, 'b', 'DisplayName', 'Experimental');
     plot(time_apr, theta, '--r', 'LineWidth', 2, 'DisplayName', 'Approximation');
     xlabel('Time, s');
     ylabel('Angle, rad');
     title(sprintf('Angle vs Time (Voltage %d V)', U));
-    legend('show');
+    legend('show', 'Location', 'southoutside');
     data_theta_interp = interp1(time_theta, data_theta, time, 'linear', 'extrap');
     plot(time, data_theta_interp, '-', 'DisplayName', sprintf('SIMULINK = %d V', U_pr));
+    grid on;
     hold off;
-
-
 
     omega_apr = U_pr * k * (1 - exp(-time_apr / Tm));
     time_omega = simOut.omega.Time; % Время для omega
@@ -90,14 +92,15 @@ for i = 1:length(files)
 
     figure;
     hold on;
-    plot(time, omega, 'b', 'DisplayName', 'Experimental ω');
-    plot(time_apr, omega_apr, '--r', 'LineWidth', 2, 'DisplayName', 'Approximated ω');
+    plot(time, omega, 'b', 'DisplayName', 'Experimental');
+    plot(time_apr, omega_apr, '--r', 'LineWidth', 2, 'DisplayName', 'Approximation');
     xlabel('Time, s');
     ylabel('Angular Speed, rad/s');
     title(sprintf('Angular Speed vs Time (Voltage %d V)', U));
-    legend('show');
+    legend('show', 'Location', 'southoutside');
     data_omega_interp = interp1(time_omega, data_omega, time, 'linear', 'extrap');
     plot(time, data_omega_interp, '-', 'DisplayName', sprintf('SIMULINK = %d V', U_pr));
+    grid on;
     hold off;
 end
 
@@ -105,9 +108,11 @@ figure(1);
 plot(voltages, flip(w_nls), '-', 'DisplayName', sprintf('SIMULINK = %d V', U_pr));
 xlabel('voltages, V');
 ylabel('Angular Speed, rad/s');
+grid on;
+
 
 figure(2);
 plot(voltages, flip(Tms), '-', 'DisplayName', sprintf('SIMULINK = %d V', U_pr));
 xlabel('voltages, V');
 ylabel('Tm, с');
-
+grid on;
